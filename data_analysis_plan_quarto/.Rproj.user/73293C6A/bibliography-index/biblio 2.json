@@ -1,0 +1,332 @@
+{
+    "sources": [
+        {
+            "URL": "https://www.researchgate.net/profile/Ryan-Boyd-8/publication/358725479_The_Development_and_Psychometric_Properties_of_LIWC-22/links/6210f62c4be28e145ca1e60b/The-Development-and-Psychometric-Properties-of-LIWC-22.pdf",
+            "author": [
+                {
+                    "family": "Boyd",
+                    "given": "Ryan L."
+                },
+                {
+                    "family": "Ashokkumar",
+                    "given": "Ashwini"
+                },
+                {
+                    "family": "Seraj",
+                    "given": "Sarah"
+                },
+                {
+                    "family": "Pennebaker",
+                    "given": "James W."
+                }
+            ],
+            "container-title": "Austin, TX: University of Texas at Austin",
+            "id": "boyd2022",
+            "issued": {
+                "date-parts": [
+                    [
+                        2022
+                    ]
+                ]
+            },
+            "page": "147",
+            "title": "The development and psychometric properties of LIWC-22",
+            "type": "article-journal"
+        },
+        {
+            "DOI": "10.1177/0261927X15614605",
+            "URL": "https://doi.org/10.1177/0261927X15614605",
+            "author": [
+                {
+                    "family": "Markowitz",
+                    "given": "David M."
+                },
+                {
+                    "family": "Hancock",
+                    "given": "Jeffrey T."
+                }
+            ],
+            "container-title": "Journal of Language and Social Psychology",
+            "id": "markowitz2016",
+            "issue": "4",
+            "issued": {
+                "date-parts": [
+                    [
+                        2016,
+                        9,
+                        1
+                    ]
+                ]
+            },
+            "language": "en",
+            "note": "Publisher: SAGE Publications Inc",
+            "page": "435-445",
+            "title": "Linguistic Obfuscation in Fraudulent Science",
+            "type": "article-journal",
+            "volume": "35"
+        },
+        {
+            "DOI": "10.1177/0261927X15614605",
+            "URL": "https://doi.org/10.1177/0261927X15614605",
+            "author": [
+                {
+                    "family": "Markowitz",
+                    "given": "David M."
+                },
+                {
+                    "family": "Hancock",
+                    "given": "Jeffrey T."
+                }
+            ],
+            "container-title": "Journal of Language and Social Psychology",
+            "id": "markowitz2016a",
+            "issue": "4",
+            "issued": {
+                "date-parts": [
+                    [
+                        2016,
+                        9,
+                        1
+                    ]
+                ]
+            },
+            "language": "en",
+            "note": "Publisher: SAGE Publications Inc",
+            "page": "435-445",
+            "title": "Linguistic Obfuscation in Fraudulent Science",
+            "type": "article-journal",
+            "volume": "35"
+        },
+        {
+            "DOI": "10.1177/0261927X15614605",
+            "URL": "https://doi.org/10.1177/0261927X15614605",
+            "author": [
+                {
+                    "family": "Markowitz",
+                    "given": "David M."
+                },
+                {
+                    "family": "Hancock",
+                    "given": "Jeffrey T."
+                }
+            ],
+            "container-title": "Journal of Language and Social Psychology",
+            "id": "markowitz2016b",
+            "issue": "4",
+            "issued": {
+                "date-parts": [
+                    [
+                        2016,
+                        9,
+                        1
+                    ]
+                ]
+            },
+            "language": "en",
+            "note": "Publisher: SAGE Publications Inc",
+            "page": "435-445",
+            "title": "Linguistic Obfuscation in Fraudulent Science",
+            "type": "article-journal",
+            "volume": "35"
+        },
+        {
+            "URL": "https://studenttheses.uu.nl/handle/20.500.12932/42411",
+            "author": [
+                {
+                    "family": "Schmidt",
+                    "given": "Eveline"
+                }
+            ],
+            "genre": "PhD thesis",
+            "id": "schmidt2022",
+            "issued": {
+                "date-parts": [
+                    [
+                        2022
+                    ]
+                ]
+            },
+            "language": "en",
+            "note": "Accepted: 2022-09-09T00:02:51Z",
+            "title": "Can linguistic features unmask fraudulent research? A study that builds an NLP classifier to distinguish retracted papers from non-retracted papers based on text and linguistic features.",
+            "type": "thesis"
+        },
+        {
+            "DOI": "10.1371/journal.pone.0105937",
+            "URL": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4143312/",
+            "author": [
+                {
+                    "family": "Markowitz",
+                    "given": "David M."
+                },
+                {
+                    "family": "Hancock",
+                    "given": "Jeffrey T."
+                }
+            ],
+            "container-title": "PLoS ONE",
+            "id": "markowitz2014",
+            "issue": "8",
+            "issued": {
+                "date-parts": [
+                    [
+                        2014,
+                        8,
+                        25
+                    ]
+                ]
+            },
+            "note": "PMID: 25153333 PMCID: PMC4143312",
+            "page": "e105937",
+            "title": "Linguistic traces of a scientific fraud: The case of diederik stapel",
+            "title-short": "Linguistic traces of a scientific fraud",
+            "type": "article-journal",
+            "volume": "9"
+        },
+        {
+            "DOI": "10.1177/01655515231176650",
+            "URL": "https://doi.org/10.1177/01655515231176650",
+            "author": [
+                {
+                    "family": "Dehdarirad",
+                    "given": "Tahereh"
+                },
+                {
+                    "family": "Schirone",
+                    "given": "Marco"
+                }
+            ],
+            "container-title": "Journal of Information Science",
+            "id": "dehdarirad2023",
+            "issued": {
+                "date-parts": [
+                    [
+                        2023,
+                        5,
+                        25
+                    ]
+                ]
+            },
+            "language": "en",
+            "note": "Publisher: SAGE Publications Ltd",
+            "page": "01655515231176650",
+            "title": "Use of positive terms and certainty language in retracted and non-retracted articles: The case of biochemistry",
+            "title-short": "Use of positive terms and certainty language in retracted and non-retracted articles",
+            "type": "article-journal"
+        },
+        {
+            "DOI": "10.1177/00222437221134802",
+            "URL": "https://doi.org/10.1177/00222437221134802",
+            "author": [
+                {
+                    "family": "Rocklage",
+                    "given": "Matthew D."
+                },
+                {
+                    "family": "He",
+                    "given": "Sharlene"
+                },
+                {
+                    "family": "Rucker",
+                    "given": "Derek D."
+                },
+                {
+                    "family": "Nordgren",
+                    "given": "Loran F."
+                }
+            ],
+            "container-title": "Journal of Marketing Research",
+            "id": "rocklage2023",
+            "issue": "5",
+            "issued": {
+                "date-parts": [
+                    [
+                        2023,
+                        10,
+                        1
+                    ]
+                ]
+            },
+            "language": "en",
+            "note": "Publisher: SAGE Publications Inc",
+            "page": "870-888",
+            "title": "Beyond Sentiment: The Value and Measurement of Consumer Certainty in Language",
+            "title-short": "Beyond Sentiment",
+            "type": "article-journal",
+            "volume": "60"
+        },
+        {
+            "URL": "https://chat.openai.com/g/g-HMNcP6w7d-data-analysis",
+            "author": [
+                {
+                    "family": "OpenAI"
+                }
+            ],
+            "id": "openai2023",
+            "issued": {
+                "date-parts": [
+                    [
+                        2023
+                    ]
+                ]
+            },
+            "publisher": "Open AI",
+            "title": "Data analysis GPT",
+            "type": "book"
+        },
+        {
+            "author": [
+                {
+                    "family": "OpenAI"
+                }
+            ],
+            "id": "openai",
+            "publisher": "OpenAI",
+            "title": "ChatGPT",
+            "type": "book"
+        },
+        {
+            "id": "jupyter2023",
+            "issued": {
+                "date-parts": [
+                    [
+                        2023
+                    ]
+                ]
+            },
+            "title": "Jupyter notebook",
+            "type": "book"
+        },
+        {
+            "URL": "https://www.python.org/",
+            "id": "python2023",
+            "issued": {
+                "date-parts": [
+                    [
+                        2023
+                    ]
+                ]
+            },
+            "publisher": "Python Software Foundation",
+            "title": "Python",
+            "type": "book"
+        },
+        {
+            "URL": "https://www.R-project.org/",
+            "id": "r:alan2023",
+            "issued": {
+                "date-parts": [
+                    [
+                        2023
+                    ]
+                ]
+            },
+            "publisher": "R Foundation for Statistical Computing",
+            "publisher-place": "Vienna, Austria",
+            "title": "R: A language and environment for statistical computing.",
+            "title-short": "R",
+            "type": "book"
+        }
+    ],
+    "project_biblios": []
+}
