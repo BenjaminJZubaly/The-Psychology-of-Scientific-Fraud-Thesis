@@ -3053,6 +3053,7 @@ vertical-align: -.125em;
   </ul></li>
   <li><a href="#data-analysis" id="toc-data-analysis" class="nav-link" data-scroll-target="#data-analysis">Data Analysis</a>
   <ul class="collapse">
+  <li><a href="#data-cleaning" id="toc-data-cleaning" class="nav-link" data-scroll-target="#data-cleaning">Data Cleaning</a></li>
   <li><a href="#data-exploration" id="toc-data-exploration" class="nav-link" data-scroll-target="#data-exploration">Data Exploration</a>
   <ul class="collapse">
   <li><a href="#dealing-with-missing-data" id="toc-dealing-with-missing-data" class="nav-link" data-scroll-target="#dealing-with-missing-data">Dealing with Missing Data</a></li>
@@ -3325,7 +3326,7 @@ vertical-align: -.125em;
 <section id="data-analysis" class="level1">
 <h1>Data Analysis</h1>
 <p>The following section will detail all processes of data analysis in a chronological order. All data analysis will be conducted in R <span class="citation" data-cites="r:alan2023">(<a href="#ref-r:alan2023" role="doc-biblioref"><em>R</em>, 2023</a>)</span> using the RStudio IDE <span class="citation" data-cites="rstudioteam2023">(<a href="#ref-rstudioteam2023" role="doc-biblioref">RStudio Team, 2023</a>)</span>, and all analyses will be ran and documented within a Quarto document <span class="citation" data-cites="quarto2023">(<a href="#ref-quarto2023" role="doc-biblioref"><em>Quarto</em>, 2023</a>)</span>. The data exploration section will roughly explain procedures that will be used to explore the data before further analyses. The hypothesis testing section will detail the procedures of testing the study hypotheses, including each null hypothesis significance test (NHST) and the justification for it. It will also include the R code for each analysis.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> For each NHST, an alpha of p &lt; .05 will be used to determine statistical significance.</p>
-<p>Although the follwing may not represent the actual variable names in the final study dataset, the following abbreviations will be used to refer to study variables in the code:</p>
+<p>Although the following may not represent the actual variable names in the final study dataset, the following abbreviations will be used to refer to study variables in the code:</p>
 <p><code>PaperID</code>: Unique identifier for each paper (i.e., the paper DOI).</p>
 <p><code>PaperType</code>: Categorical variable indicating SAFP, SAGP, MAFP, or MAGP.</p>
 <p><code>LingObf</code>: Continuous variable for linguistic obfuscation.</p>
@@ -3333,7 +3334,15 @@ vertical-align: -.125em;
 <p><code>Refs</code>: Count variable for references.</p>
 <p><code>FraudCorrAuth</code>: Dichotomous variable indicating if the fraudulent author is the corresponding author (1) or is not (0). Unknown cases will be marked in a seperate variable with this variable left blank.</p>
 <p><code>NumAuth</code>: Count variable indicating the number of authors for each paper.</p>
-<p>I am also going to document here the processes of simple steps that I will follow while doing the analysis, because I am a novice.</p>
+<p><code>abstraction</code>: Abstraction index composed of the sum of standardized scores for <code>article</code>, <code>prep</code>, and <code>quantity</code>.</p>
+<p><code>article</code>: Articles from LIWC.</p>
+<p><code>prep</code>: Prepositions from LIWC.</p>
+<p><code>quantity</code>: Quantities from LIWC.</p>
+<p><code>cause</code>: Causation terms from LIWC.</p>
+<p><code>jargon</code>: The percent of words not captured by LIWC (100-<code>Dic</code>).</p>
+<p><code>Dic</code>: The percentage of words captured by all LIWC dictionaries.</p>
+<p><code>emo_pos</code>: Positive emotion terms from LIWC.</p>
+<p><code>flesch_re</code>: Flesch Reading Ease from ARTE.</p>
 <ol type="1">
 <li><p>Installing Necessary Packages:</p>
 <div class="cell">
@@ -3354,6 +3363,62 @@ vertical-align: -.125em;
 <span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>data <span class="co"># For displaying study dataset</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></li>
 </ol>
+<section id="data-cleaning" class="level2">
+<h2 class="anchored" data-anchor-id="data-cleaning">Data Cleaning</h2>
+<p>To conduct the analysis, we will first need to calculate the <code>LingObf</code> variable by calculating the <code>abstraction</code> index and <code>jargon</code> words; creating standardized scores for <code>abstraction</code>, <code>cause</code>, <code>jargon</code>, <code>emo_pos</code>, and <code>flesch_re</code>; and calculating the <code>LingObf</code> composite variable from these standardized scores.</p>
+<ol type="1">
+<li><p>First, we will calculate the <code>abstraction</code> index by creating standardized scores for <code>article</code>, <code>prep</code>, and <code>quantity</code> and summing them.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate standardized scores for article, prep, and quantity and add them to the dataset</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>articles_standardized <span class="ot">&lt;-</span> <span class="fu">scale</span>(data<span class="sc">$</span>articles)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>prep_standardized <span class="ot">&lt;-</span> <span class="fu">scale</span>(data<span class="sc">$</span>prep)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>quantity_standardized <span class="ot">&lt;-</span> <span class="fu">scale</span>(data<span class="sc">$</span>quantity)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the new variable &#39;abstraction&#39; as the sum of the three standardized variables</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>abstraction <span class="ot">&lt;-</span> data<span class="sc">$</span>articles_standardized <span class="sc">+</span> data<span class="sc">$</span>prep_standardized <span class="sc">+</span> data<span class="sc">$</span>quantity_standardized</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the updated dataset</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></li>
+<li><p>Next, we will calculate the <code>jargon</code> words by subtracting <code>Dic</code> from 100.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate the new variable &#39;jargon&#39; by subtracting &#39;Dic&#39; from 100</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>jargon <span class="ot">&lt;-</span> <span class="dv">100</span> <span class="sc">-</span> data<span class="sc">$</span>Dic</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the updated dataset</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></li>
+<li><p>Next, we will create standardized scores for each subcomponent of the <code>LingObf</code>.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Standardize the new set of variables and add them to the dataset</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>abstraction_standardized <span class="ot">&lt;-</span> <span class="fu">scale</span>(data<span class="sc">$</span>abstraction)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>cause_standardized <span class="ot">&lt;-</span> <span class="fu">scale</span>(data<span class="sc">$</span>cause)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>jargon_standardized <span class="ot">&lt;-</span> <span class="fu">scale</span>(data<span class="sc">$</span>jargon)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>emo_pos_standardized <span class="ot">&lt;-</span> <span class="fu">scale</span>(data<span class="sc">$</span>emo_pos)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>flesch_re_standardized <span class="ot">&lt;-</span> <span class="fu">scale</span>(data<span class="sc">$</span>flesch_re)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the updated dataset</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></li>
+<li><p>Finally, we will calculate the <code>LingObf</code> variable using the following formula: [cause_standardized + abstraction_standardized + jargon_standardized] – [emo_pos_standardized + flesch_re_standardized].</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate &#39;LingObf&#39;</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>LingObf <span class="ot">&lt;-</span> (data<span class="sc">$</span>cause_standardized <span class="sc">+</span> data<span class="sc">$</span>abstraction_standardized <span class="sc">+</span> data<span class="sc">$</span>jargon_standardized) <span class="sc">-</span> </span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>                (data<span class="sc">$</span>emo_pos_standardized <span class="sc">+</span> data<span class="sc">$</span>flesch_re_standardized)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the updated dataset</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></li>
+<li><p>For good measure, we will save this updated dataset as a csv file.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Specifying the new file path to downloads</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>clean_study_data_file_path <span class="ot">&lt;-</span> <span class="st">&quot;/Users/benjaminzubaly/Downloads/thesis_study_dataset_clean.csv&quot;</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Saving the clean dataset as a new CSV file</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(data, clean_study_data_file_path)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></li>
+</ol>
+</section>
 <section id="data-exploration" class="level2">
 <h2 class="anchored" data-anchor-id="data-exploration">Data Exploration</h2>
 <section id="dealing-with-missing-data" class="level3">
@@ -3361,25 +3426,25 @@ vertical-align: -.125em;
 <ol type="1">
 <li><p>Data will be first inspected for missing scores.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr) <span class="co"># Loading package for data manipulation and handling missing values</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># To summarize the number of missing values in each column</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>missing_data_summary <span class="ot">&lt;-</span> <span class="fu">sapply</span>(data, <span class="cf">function</span>(x) <span class="fu">sum</span>(<span class="fu">is.na</span>(x)))</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(missing_data_summary) <span class="co"># To see summary of missing values for all columns</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr) <span class="co"># Loading package for data manipulation and handling missing values</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># To summarize the number of missing values in each column</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>missing_data_summary <span class="ot">&lt;-</span> <span class="fu">sapply</span>(data, <span class="cf">function</span>(x) <span class="fu">sum</span>(<span class="fu">is.na</span>(x)))</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(missing_data_summary) <span class="co"># To see summary of missing values for all columns</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></li>
 <li><p>For any missing categorical data, the cell will be left empty so as not to introduce bias.</p></li>
 <li><p>For any missing continuous data, we will impute the mean value of the variable within <code>PaperType</code> using the following code. This will allow us to maintain the integrity of group means by not biasing the score from the influence of the scores for other paper groups.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Imputing missing values with the mean of the respective PaperType group</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> data <span class="sc">%&gt;%</span></span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(PaperType) <span class="sc">%&gt;%</span></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">LingObf =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(LingObf), <span class="fu">mean</span>(LingObf, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), LingObf),</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">CertSent =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(CertSent), <span class="fu">mean</span>(CertSent, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), CertSent),</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">Refs =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(Refs), <span class="fu">mean</span>(Refs, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), Refs)</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Imputing missing values with the mean of the respective PaperType group</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> data <span class="sc">%&gt;%</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(PaperType) <span class="sc">%&gt;%</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">LingObf =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(LingObf), <span class="fu">mean</span>(LingObf, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), LingObf),</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">CertSent =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(CertSent), <span class="fu">mean</span>(CertSent, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), CertSent),</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">Refs =</span> <span class="fu">ifelse</span>(<span class="fu">is.na</span>(Refs), <span class="fu">mean</span>(Refs, <span class="at">na.rm =</span> <span class="cn">TRUE</span>), Refs)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></li>
 </ol>
 </section>
@@ -3388,29 +3453,29 @@ vertical-align: -.125em;
 <ol type="1">
 <li><p>General descriptive statistics will then be produced for each variable and for each variable within <code>PaperType</code> groups using the <code>psych</code> package.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(psych) <span class="co"># To load psych package</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Generating descriptive statistics for the entire study dataset</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>descriptive_stats_all_data <span class="ot">&lt;-</span> <span class="fu">describe</span>(data)</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(descriptive_stats_all_data)</span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Generating descriptive statistics within PaperType groups</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>descriptive_stats_by_PaperType <span class="ot">&lt;-</span> <span class="fu">describeby</span>(data, <span class="at">group =</span> data<span class="sc">$</span>PaperType)</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(descriptive_stats_by_PaperType)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(psych) <span class="co"># To load psych package</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Generating descriptive statistics for the entire study dataset</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>descriptive_stats_all_data <span class="ot">&lt;-</span> <span class="fu">describe</span>(data)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(descriptive_stats_all_data)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Generating descriptive statistics within PaperType groups</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>descriptive_stats_by_PaperType <span class="ot">&lt;-</span> <span class="fu">describeby</span>(data, <span class="at">group =</span> data<span class="sc">$</span>PaperType)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(descriptive_stats_by_PaperType)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></li>
 <li><p>Frequency tables will be produced for categorical variables, both for the data in general and within <code>PaperType</code> groups. A proportion table will be produced to more easily compare frequencies across <code>PaperType</code> groups.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To produce frequency table for all categorical variables</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data<span class="sc">$</span>CategoricalVariable)</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="co"># To produce frequency table for frequencies within PaperType groups for all categorical variables</span></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>frequency_table_by_PaperType <span class="ot">&lt;-</span> <span class="fu">table</span>(data<span class="sc">$</span>PaperType, data<span class="sc">$</span>CategoricalVariable)</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Proportions table to compare frequencies across PaperType groups</span></span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>proportion_table_by_PaperType <span class="ot">&lt;-</span> <span class="fu">prop.table</span>(frequency_table_by_PaperType, <span class="at">margin =</span> <span class="dv">1</span>)</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(frequency_table_by_PaperType)</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(proportion_table_by_PaperType)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To produce frequency table for all categorical variables</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data<span class="sc">$</span>CategoricalVariable)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># To produce frequency table for frequencies within PaperType groups for all categorical variables</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>frequency_table_by_PaperType <span class="ot">&lt;-</span> <span class="fu">table</span>(data<span class="sc">$</span>PaperType, data<span class="sc">$</span>CategoricalVariable)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Proportions table to compare frequencies across PaperType groups</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>proportion_table_by_PaperType <span class="ot">&lt;-</span> <span class="fu">prop.table</span>(frequency_table_by_PaperType, <span class="at">margin =</span> <span class="dv">1</span>)</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(frequency_table_by_PaperType)</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(proportion_table_by_PaperType)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></li>
 </ol>
 </section>
@@ -3419,68 +3484,84 @@ vertical-align: -.125em;
 <ol type="1">
 <li><p>Using the <code>ggplot2</code> package, frequency distributions and box plots will be generated for <code>LingObf</code>, <code>CertSent</code>, and <code>Refs</code>. A bar plot will be produced for <code>FraudCorrAuth</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2) <span class="co"># To load the ggplot2 package</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># To produce histogram for a continuous variable (IMPORTANT: &quot;ContinuousVariable&quot; should be replaced with the actual variable name)</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(data, <span class="fu">aes</span>(<span class="at">x =</span> ContinuousVariable)) <span class="sc">+</span> </span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">1</span>, <span class="at">fill =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">color =</span> <span class="st">&quot;black&quot;</span>) <span class="sc">+</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Histogram of ContinuousVariable for Entire Dataset&quot;</span>)</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="co"># To produce box plots for a continuous variable (IMPORTANT: &quot;ContinuousVariable&quot; should be replaced with the actual variable name)</span></span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(data, <span class="fu">aes</span>(<span class="at">y =</span> ContinuousVariable)) <span class="sc">+</span> </span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">fill =</span> <span class="st">&quot;lightblue&quot;</span>, <span class="at">color =</span> <span class="st">&quot;black&quot;</span>) <span class="sc">+</span></span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Box Plot of ContinuousVariable for Entire Dataset&quot;</span>)</span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="co"># To produce bar plot for FraudCorrAuth</span></span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(data, <span class="fu">aes</span>(<span class="at">x =</span> FraudCorrAuth)) <span class="sc">+</span> </span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">fill =</span> <span class="st">&quot;coral&quot;</span>) <span class="sc">+</span></span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Bar Plot of FraudCorrAuth for Entire Dataset&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2) <span class="co"># To load the ggplot2 package</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co"># To produce histogram for a continuous variable (IMPORTANT: &quot;ContinuousVariable&quot; should be replaced with the actual variable name)</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(data, <span class="fu">aes</span>(<span class="at">x =</span> ContinuousVariable)) <span class="sc">+</span> </span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">1</span>, <span class="at">fill =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">color =</span> <span class="st">&quot;black&quot;</span>) <span class="sc">+</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Histogram of ContinuousVariable for Entire Dataset&quot;</span>)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="co"># To produce box plots for a continuous variable (IMPORTANT: &quot;ContinuousVariable&quot; should be replaced with the actual variable name)</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(data, <span class="fu">aes</span>(<span class="at">y =</span> ContinuousVariable)) <span class="sc">+</span> </span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">fill =</span> <span class="st">&quot;lightblue&quot;</span>, <span class="at">color =</span> <span class="st">&quot;black&quot;</span>) <span class="sc">+</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Box Plot of ContinuousVariable for Entire Dataset&quot;</span>)</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a><span class="co"># To produce bar plot for FraudCorrAuth</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(data, <span class="fu">aes</span>(<span class="at">x =</span> FraudCorrAuth)) <span class="sc">+</span> </span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">fill =</span> <span class="st">&quot;coral&quot;</span>) <span class="sc">+</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Bar Plot of FraudCorrAuth for Entire Dataset&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></li>
 <li><p>Using the <code>ggplot2</code> package, frequency distributions and box plots will be generated for <code>LingObf</code>, <code>CertSent</code>, and <code>Refs</code> within <code>PaperType</code> groups. Bar plots will be produced for <code>FraudCorrAuth</code> within <code>PaperType</code> groups.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To produce histograms for a continuous variable within PaperType groups (IMPORTANT: &quot;ContinuousVariable&quot; should be replaced with the actual variable name)</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(data, <span class="fu">aes</span>(<span class="at">x =</span> ContinuousVariable)) <span class="sc">+</span> </span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">1</span>, <span class="at">fill =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">color =</span> <span class="st">&quot;black&quot;</span>) <span class="sc">+</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> PaperType) <span class="sc">+</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Histograms of ContinuousVariable by PaperType&quot;</span>)</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co"># To produce box plots for a continuous variable within PaperType groups (IMPORTANT: &quot;ContinuousVariable&quot; should be replaced with the actual variable name)</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(data, <span class="fu">aes</span>(<span class="at">x =</span> PaperType, <span class="at">y =</span> ContinuousVariable)) <span class="sc">+</span> </span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">fill =</span> <span class="st">&quot;lightblue&quot;</span>, <span class="at">color =</span> <span class="st">&quot;black&quot;</span>) <span class="sc">+</span></span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Box Plot of ContinuousVariable by PaperType&quot;</span>)</span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="co"># To produce bar plots for FraudCorrAuth within PaperType groups</span></span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(data, <span class="fu">aes</span>(<span class="at">x =</span> PaperType, <span class="at">fill =</span> FraudCorrAuth)) <span class="sc">+</span> </span>
-<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">position =</span> <span class="st">&quot;dodge&quot;</span>) <span class="sc">+</span></span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Bar Plot of FraudCorrAuth by PaperType&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To produce histograms for a continuous variable within PaperType groups (IMPORTANT: &quot;ContinuousVariable&quot; should be replaced with the actual variable name)</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(data, <span class="fu">aes</span>(<span class="at">x =</span> ContinuousVariable)) <span class="sc">+</span> </span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">binwidth =</span> <span class="dv">1</span>, <span class="at">fill =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">color =</span> <span class="st">&quot;black&quot;</span>) <span class="sc">+</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> PaperType) <span class="sc">+</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Histograms of ContinuousVariable by PaperType&quot;</span>)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co"># To produce box plots for a continuous variable within PaperType groups (IMPORTANT: &quot;ContinuousVariable&quot; should be replaced with the actual variable name)</span></span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(data, <span class="fu">aes</span>(<span class="at">x =</span> PaperType, <span class="at">y =</span> ContinuousVariable)) <span class="sc">+</span> </span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">fill =</span> <span class="st">&quot;lightblue&quot;</span>, <span class="at">color =</span> <span class="st">&quot;black&quot;</span>) <span class="sc">+</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Box Plot of ContinuousVariable by PaperType&quot;</span>)</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="co"># To produce bar plots for FraudCorrAuth within PaperType groups</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(data, <span class="fu">aes</span>(<span class="at">x =</span> PaperType, <span class="at">fill =</span> FraudCorrAuth)) <span class="sc">+</span> </span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">position =</span> <span class="st">&quot;dodge&quot;</span>) <span class="sc">+</span></span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">&quot;Bar Plot of FraudCorrAuth by PaperType&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></li>
 </ol>
 </section>
 <section id="bivariate-correlations" class="level3">
 <h3 class="anchored" data-anchor-id="bivariate-correlations">Bivariate Correlations</h3>
-<p>In order to further explore data characteristics, bivariate correlations between outcome variables will be produced. As these are only for exploring data and not testing predictions, assumptions will not be tested, and the relationships will not be probed for statistical significance.</p>
+<p>In order to further explore data characteristics, bivariate correlations between outcome variables will be produced. As these are only for exploring data and not testing predictions, assumptions will not be tested, and the relationships will not be probed for statistical significance. Then, correlations for subcomponents of composite variables will be produced.</p>
 <ol type="1">
-<li><p>Pearson bivariate correlations will produced for <code>LingObf</code>, <code>CertSent</code>, and <code>Refs</code>.</p>
+<li><p>Pearson bivariate correlations will be produced for <code>LingObf</code>, <code>CertSent</code>, and <code>Refs</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To produce correlation matrix for LingObf, CertSent, and Refs variables within whole dataset</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># To calculate the Pearson correlation coefficients between the numerical outcome variables</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>correlation_matrix_num_outcomes <span class="ot">&lt;-</span> <span class="fu">cor</span>(data[<span class="fu">c</span>(<span class="st">&quot;LingObf&quot;</span>, <span class="st">&quot;CertSent&quot;</span>, <span class="st">&quot;Refs&quot;</span>)], <span class="at">use =</span> <span class="st">&quot;complete.obs&quot;</span>, <span class="at">method =</span> <span class="st">&quot;pearson&quot;</span>)</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="co"># To print the correlation matrix for numerical outcome variables</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(correlation_matrix_num_outcomes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To produce correlation matrix for LingObf, CertSent, and Refs variables within whole dataset</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co"># To calculate the Pearson correlation coefficients between the numerical outcome variables</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>correlation_matrix_num_outcomes <span class="ot">&lt;-</span> <span class="fu">cor</span>(data[<span class="fu">c</span>(<span class="st">&quot;LingObf&quot;</span>, <span class="st">&quot;CertSent&quot;</span>, <span class="st">&quot;Refs&quot;</span>)], <span class="at">use =</span> <span class="st">&quot;complete.obs&quot;</span>, <span class="at">method =</span> <span class="st">&quot;pearson&quot;</span>)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co"># To print the correlation matrix for numerical outcome variables</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(correlation_matrix_num_outcomes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></li>
 <li><p>Point-biserial correlations will be produced between <code>FraudCorrAuth</code> and <code>LingObf</code>, <code>CertSent</code>, and <code>Refs</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculating Point-biserial correlations between FraudCorrAuth and numerical outcome variables</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>pbcorr_FraudCorrAuth_LingObf <span class="ot">&lt;-</span> <span class="fu">cor</span>(data<span class="sc">$</span>FraudCorrAuth, data<span class="sc">$</span>LingObf, <span class="at">use =</span> <span class="st">&quot;complete.obs&quot;</span>, <span class="at">method =</span> <span class="st">&quot;pearson&quot;</span>)</span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>pbcorr_FraudCorrAuth_CertSent <span class="ot">&lt;-</span> <span class="fu">cor</span>(data<span class="sc">$</span>FraudCorrAuth, data<span class="sc">$</span>CertSent, <span class="at">use =</span> <span class="st">&quot;complete.obs&quot;</span>, <span class="at">method =</span> <span class="st">&quot;pearson&quot;</span>)</span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>pbcorr_FraudCorrAuth_Refs <span class="ot">&lt;-</span> <span class="fu">cor</span>(data<span class="sc">$</span>FraudCorrAuth, data<span class="sc">$</span>Refs, <span class="at">use =</span> <span class="st">&quot;complete.obs&quot;</span>, <span class="at">method =</span> <span class="st">&quot;pearson&quot;</span>)</span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Printing the correlation coefficients</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(pbcorr_FraudCorrAuth_LingObf)</span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(pbcorr_FraudCorrAuth_CertSent)</span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(pbcorr_FraudCorrAuth_Refs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculating Point-biserial correlations between FraudCorrAuth and numerical outcome variables</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>pbcorr_FraudCorrAuth_LingObf <span class="ot">&lt;-</span> <span class="fu">cor</span>(data<span class="sc">$</span>FraudCorrAuth, data<span class="sc">$</span>LingObf, <span class="at">use =</span> <span class="st">&quot;complete.obs&quot;</span>, <span class="at">method =</span> <span class="st">&quot;pearson&quot;</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>pbcorr_FraudCorrAuth_CertSent <span class="ot">&lt;-</span> <span class="fu">cor</span>(data<span class="sc">$</span>FraudCorrAuth, data<span class="sc">$</span>CertSent, <span class="at">use =</span> <span class="st">&quot;complete.obs&quot;</span>, <span class="at">method =</span> <span class="st">&quot;pearson&quot;</span>)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>pbcorr_FraudCorrAuth_Refs <span class="ot">&lt;-</span> <span class="fu">cor</span>(data<span class="sc">$</span>FraudCorrAuth, data<span class="sc">$</span>Refs, <span class="at">use =</span> <span class="st">&quot;complete.obs&quot;</span>, <span class="at">method =</span> <span class="st">&quot;pearson&quot;</span>)</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Printing the correlation coefficients</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(pbcorr_FraudCorrAuth_LingObf)</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(pbcorr_FraudCorrAuth_CertSent)</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(pbcorr_FraudCorrAuth_Refs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></li>
+<li><p>Pearson bivariate correlations will be produced for the subcomponents of the <code>abstraction</code> index.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate pairwise correlations among the subcomponents of the abstraction index</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>correlation_matrix_abstraction_subcomponents <span class="ot">&lt;-</span> <span class="fu">cor</span>(data[,<span class="fu">c</span>(<span class="st">&quot;articles&quot;</span>, <span class="st">&quot;prep&quot;</span>, <span class="st">&quot;quantity&quot;</span>)])</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the correlation matrix</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>correlation_matrix_abstraction_subcomponents</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></li>
+<li><p>Pearson bivariate correlations will be produced for the subcomponents of the <code>LingObf</code> index.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate pairwise correlations among the subcomponents of LingObf</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>correlation_matrix_LingObf_subcomponents <span class="ot">&lt;-</span> <span class="fu">cor</span>(data[,<span class="fu">c</span>(<span class="st">&quot;cause&quot;</span>, <span class="st">&quot;abstraction&quot;</span>, <span class="st">&quot;jargon&quot;</span>, <span class="st">&quot;emo_pos&quot;</span>, <span class="st">&quot;flesch_re&quot;</span>)])</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the correlation matrix</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>correlation_matrix_LingObf_subcomponents</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></li>
 </ol>
 </section>
@@ -3499,42 +3580,42 @@ vertical-align: -.125em;
 <ol type="1">
 <li><p>To compare fraudulent publications with genuine publications, we will first create a new data frame that contains a dichotomous grouping variable for genuine or fraudulent papers (<code>Genuine_or_Fraudulent</code>). That is, the new data frame will combine SAGP and MAGP into one category (<code>GPaper</code>) and SAFP and MAFP into another category (<code>FPaper</code>). This will be done using the <code>dplyr</code> package.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To create the new data frame with new dichotomous variable Genuine_or_Fraudulent</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>fraud_or_not_df <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Genuine_or_Fraudulent =</span> <span class="fu">ifelse</span>(PaperType <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;SAFP&quot;</span>, <span class="st">&quot;MAFP&quot;</span>), <span class="st">&quot;FPaper&quot;</span>, <span class="st">&quot;GPaper&quot;</span>))</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co"># To double-check that the new data frame was created properly</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(fraud_or_not_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To create the new data frame with new dichotomous variable Genuine_or_Fraudulent</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>fraud_or_not_df <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Genuine_or_Fraudulent =</span> <span class="fu">ifelse</span>(PaperType <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;SAFP&quot;</span>, <span class="st">&quot;MAFP&quot;</span>), <span class="st">&quot;FPaper&quot;</span>, <span class="st">&quot;GPaper&quot;</span>))</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="co"># To double-check that the new data frame was created properly</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(fraud_or_not_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></li>
 <li><p>To check the assumption of normality we will use the <code>ggplot2</code> package to create Q-Q plots for <code>LingObf</code> within the <code>FPaper</code> and <code>GPaper</code> groups. The Q-Q plots will be investigated visually. Because each group will have approximately n=60 cases, our t-test should be robust to violations of this assumption. However, if the assumption of normality is grossly violated we will use a bootstrapped t-test to fit a more robust model.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To produce Q-Q plot for LingObf within the FPaper and GPaper groups</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">qplot</span>(<span class="at">sample =</span> fraud_or_not_df<span class="sc">$</span>LingObf, <span class="at">geom =</span> <span class="st">&quot;qq&quot;</span>) <span class="sc">+</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Genuine_or_Fraudulent)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To produce Q-Q plot for LingObf within the FPaper and GPaper groups</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">qplot</span>(<span class="at">sample =</span> fraud_or_not_df<span class="sc">$</span>LingObf, <span class="at">geom =</span> <span class="st">&quot;qq&quot;</span>) <span class="sc">+</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Genuine_or_Fraudulent)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></li>
 <li><p>To check the assumption of homogeneity of variances, we will conduct Levene’s test using the <code>car</code> package.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(car) <span class="co"># To load the car package</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct Levene&#39;s test for homogeneity of variances</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>hyp_one_a_levene_test <span class="ot">&lt;-</span> <span class="fu">leveneTest</span>(LingObf <span class="sc">~</span> Genuine_or_Fraudulent, <span class="at">data =</span> fraud_or_not_df)</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co"># To print Levene&#39;s test result</span></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_one_a_levene_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(car) <span class="co"># To load the car package</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct Levene&#39;s test for homogeneity of variances</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>hyp_one_a_levene_test <span class="ot">&lt;-</span> <span class="fu">leveneTest</span>(LingObf <span class="sc">~</span> Genuine_or_Fraudulent, <span class="at">data =</span> fraud_or_not_df)</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="co"># To print Levene&#39;s test result</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_one_a_levene_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></li>
 <li><p>Once assumptions are tested, we will run the independent samples t-test using the new data frame to determine whether there is a difference between fraudulent papers and genuine papers. If Levene’s test rejects the assumption of homogeneity of variance (i.e., if the variances of the two groups are significantly different with an ⍺ = .05), then we will run Welch’s t-test instead.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct the regular independent samples t-test</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>hyp_one_a_t_test <span class="ot">&lt;-</span> <span class="fu">t.test</span>(LingObf <span class="sc">~</span> Genuine_or_Fraudulent, <span class="at">data =</span> fraud_or_not_df)</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co"># To print the regular independent samples t-test result</span></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_one_a_t_test)</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct Welch&#39;s t-test if Levene&#39;s test is significant</span></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>hyp_one_a_welch_t_test <span class="ot">&lt;-</span> <span class="fu">t.test</span>(LingObf <span class="sc">~</span> Genuine_or_Fraudulent, <span class="at">data =</span> fraud_or_not_df, <span class="at">var.equal =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="co"># To print the Welch&#39;s t-test result</span></span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_one_a_welch_t_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct the regular independent samples t-test</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>hyp_one_a_t_test <span class="ot">&lt;-</span> <span class="fu">t.test</span>(LingObf <span class="sc">~</span> Genuine_or_Fraudulent, <span class="at">data =</span> fraud_or_not_df)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="co"># To print the regular independent samples t-test result</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_one_a_t_test)</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct Welch&#39;s t-test if Levene&#39;s test is significant</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>hyp_one_a_welch_t_test <span class="ot">&lt;-</span> <span class="fu">t.test</span>(LingObf <span class="sc">~</span> Genuine_or_Fraudulent, <span class="at">data =</span> fraud_or_not_df, <span class="at">var.equal =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a><span class="co"># To print the Welch&#39;s t-test result</span></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_one_a_welch_t_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></li>
 </ol>
 </section>
@@ -3544,48 +3625,48 @@ vertical-align: -.125em;
 <ol type="1">
 <li><p>To check the assumption of normality we will use the <code>ggplot2</code> package to create Q-Q plots for <code>LingObf</code> using our original study dataset. The Q-Q plots will be investigated visually. If the assumption of normality is violated we will use a bootstrapped t-test to fit a more robust model.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To produce Q-Q plot for LingObf within the PaperType groups</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">qplot</span>(<span class="at">sample =</span> data<span class="sc">$</span>LingObf, <span class="at">geom =</span> <span class="st">&quot;qq&quot;</span>) <span class="sc">+</span></span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>PaperType)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To produce Q-Q plot for LingObf within the PaperType groups</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">qplot</span>(<span class="at">sample =</span> data<span class="sc">$</span>LingObf, <span class="at">geom =</span> <span class="st">&quot;qq&quot;</span>) <span class="sc">+</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>PaperType)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></li>
 <li><p>To test the assumption of homogeneity of variances, we will conduct Levene’s test.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct Levene&#39;s test for homogeneity of variances</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>hyp_one_b_levene_test <span class="ot">&lt;-</span> <span class="fu">leveneTest</span>(LingObf <span class="sc">~</span> PaperType, <span class="at">data =</span> data)</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co"># To print Levene&#39;s test results</span></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_one_b_levene_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct Levene&#39;s test for homogeneity of variances</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>hyp_one_b_levene_test <span class="ot">&lt;-</span> <span class="fu">leveneTest</span>(LingObf <span class="sc">~</span> PaperType, <span class="at">data =</span> data)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="co"># To print Levene&#39;s test results</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_one_b_levene_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></li>
 <li><p>Once assumptions are tested, we will run the ANOVA using the original study data to determine whether there is a difference exists between the four groups. If Levene’s test rejects the assumption of homogeneity of variance (i.e., if the variances of the four groups are significantly different with an ⍺ = .05), then we will run Welch’s ANOVA instead.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct the one-way ANOVA if assumptions are met</span></span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>hyp_one_b_anova <span class="ot">&lt;-</span> <span class="fu">aov</span>(LingObf <span class="sc">~</span> PaperType, <span class="at">data =</span> data)</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co"># To see summary of one-way ANOVA results</span></span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(hyp_one_b_anova)</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct the Welch&#39;s ANOVA if assumption of homogeneity of variance is violated</span></span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>hyp_one_b_welch_anova <span class="ot">&lt;-</span> <span class="fu">oneway.test</span>(LingObf <span class="sc">~</span> PaperType, <span class="at">data =</span> data, <span class="at">var.equal =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="co"># To see summary of one-way Welch&#39;s ANOVA results</span></span>
-<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(hyp_one_b_welch_anova)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct the one-way ANOVA if assumptions are met</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>hyp_one_b_anova <span class="ot">&lt;-</span> <span class="fu">aov</span>(LingObf <span class="sc">~</span> PaperType, <span class="at">data =</span> data)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co"># To see summary of one-way ANOVA results</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(hyp_one_b_anova)</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct the Welch&#39;s ANOVA if assumption of homogeneity of variance is violated</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>hyp_one_b_welch_anova <span class="ot">&lt;-</span> <span class="fu">oneway.test</span>(LingObf <span class="sc">~</span> PaperType, <span class="at">data =</span> data, <span class="at">var.equal =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="co"># To see summary of one-way Welch&#39;s ANOVA results</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(hyp_one_b_welch_anova)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></li>
 <li><p>If a significant difference is found between the <code>PaperType</code> groups based on the one-way ANOVA, a post-hoc test will be used to determine where the differences lie. Tukey’s Highly Significant Difference (HSD) test will be used if a regular one-way ANOVA was used, which will adjust p-values to avoid inflating the family-wise error rate. If the Welch’s ANOVA was used, we will follow it up with the Games-Howell post-hoc test instead using the <code>rcompanion</code> package.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct Tukey&#39;s HSD test if ANOVA indicates significant difference</span></span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>hyp_one_b_TukeyHSD <span class="ot">&lt;-</span> <span class="fu">TukeyHSD</span>(hyp_one_b_anova)</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="co"># To print Tukey&#39;s HSD test results</span></span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_one_b_TukeyHSD)</span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct Games-Howell test if Welch&#39;s ANOVA was used</span></span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rcompanion) <span class="co"># To load rcompanion for Games-Howell test</span></span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="co"># To run Games-Howell post-hoc test</span></span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>hyp_one_b_games_howell <span class="ot">&lt;-</span> <span class="fu">pairwiseGamesHowellTest</span>(hyp_one_b_welch_anova)</span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a><span class="co"># To print Games-Howell test results</span></span>
-<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_one_b_games_howell)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct Tukey&#39;s HSD test if ANOVA indicates significant difference</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>hyp_one_b_TukeyHSD <span class="ot">&lt;-</span> <span class="fu">TukeyHSD</span>(hyp_one_b_anova)</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="co"># To print Tukey&#39;s HSD test results</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_one_b_TukeyHSD)</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct Games-Howell test if Welch&#39;s ANOVA was used</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rcompanion) <span class="co"># To load rcompanion for Games-Howell test</span></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a><span class="co"># To run Games-Howell post-hoc test</span></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>hyp_one_b_games_howell <span class="ot">&lt;-</span> <span class="fu">pairwiseGamesHowellTest</span>(hyp_one_b_welch_anova)</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a><span class="co"># To print Games-Howell test results</span></span>
+<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_one_b_games_howell)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></li>
 </ol>
 </section>
@@ -3601,35 +3682,35 @@ vertical-align: -.125em;
 <ol type="1">
 <li><p>To check the assumption of normality we will use the <code>ggplot2</code> package to create Q-Q plots for <code>Refs</code> within our <code>fraud_or_not_df</code> data frame within the <code>Genuine_or_Fraudulent</code> dichotomous variable. The Q-Q plots will be investigated visually. As references are technically count, rather than continuous, data, there is a higher likelihood that it will violate the assumption of normality, so in this case we will instead run a Mann-Whitney U test to compare the two groups by their median <code>Refs</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To produce Q-Q plots for Refs within the FPaper and GPaper groups</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">qplot</span>(<span class="at">sample =</span> fraud_or_not_df<span class="sc">$</span>Refs, <span class="at">geom =</span> <span class="st">&quot;qq&quot;</span>) <span class="sc">+</span></span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Genuine_or_Fraudulent)</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="co"># If the assumption of normality is supported, move to Step 2 to test the assumption of homogeneity of variance.</span></span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="co"># If the assumption of normality is violated, move to Step 3 to conduct a Mann-Whitney U test.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To produce Q-Q plots for Refs within the FPaper and GPaper groups</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="fu">qplot</span>(<span class="at">sample =</span> fraud_or_not_df<span class="sc">$</span>Refs, <span class="at">geom =</span> <span class="st">&quot;qq&quot;</span>) <span class="sc">+</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Genuine_or_Fraudulent)</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="co"># If the assumption of normality is supported, move to Step 2 to test the assumption of homogeneity of variance.</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a><span class="co"># If the assumption of normality is violated, move to Step 3 to conduct a Mann-Whitney U test.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></li>
 <li><p>To test the assumption of homogeneity of variances, we will conduct Levene’s test.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct Levene&#39;s test for homogeneity of variances</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>hyp_two_a_levene_test <span class="ot">&lt;-</span> <span class="fu">leveneTest</span>(Refs <span class="sc">~</span> Genuine_or_Fraudulent, <span class="at">data =</span> fraud_or_not_df)</span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co"># To print Levene&#39;s test result</span></span>
-<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_two_a_levene_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct Levene&#39;s test for homogeneity of variances</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>hyp_two_a_levene_test <span class="ot">&lt;-</span> <span class="fu">leveneTest</span>(Refs <span class="sc">~</span> Genuine_or_Fraudulent, <span class="at">data =</span> fraud_or_not_df)</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="co"># To print Levene&#39;s test result</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_two_a_levene_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></li>
 <li><p>Once assumptions are tested, we will run the independent samples t-test using the <code>fraud_or_not_df</code> data frame to determine whether there is a difference between fraudulent papers and genuine papers. If Levene’s test rejected the assumption of homogeneity of variance (i.e., if the variances of the two groups are significantly different with an ⍺ = .05), then we will run a Mann-Whitney U test instead, which could be better for our count data than the parametric t-test.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct the regular independent samples t-test</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>hyp_two_a_t_test <span class="ot">&lt;-</span> <span class="fu">t.test</span>(Refs <span class="sc">~</span> Genuine_or_Fraudulent, <span class="at">data =</span> fraud_or_not_df)</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="co"># To print the regular independent samples t-test result</span></span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_two_a_t_test)</span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct Mann-Whitney U test if assumptions are not supported</span></span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>hyp_two_a_mann_test <span class="ot">&lt;-</span> <span class="fu">wilcox.test</span>(Refs <span class="sc">~</span> Genuine_or_Fraudulent, <span class="at">data =</span> fraud_or_not_df)</span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a><span class="co"># To print the Mann-Whitney U test result</span></span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_two_a_mann_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct the regular independent samples t-test</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>hyp_two_a_t_test <span class="ot">&lt;-</span> <span class="fu">t.test</span>(Refs <span class="sc">~</span> Genuine_or_Fraudulent, <span class="at">data =</span> fraud_or_not_df)</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="co"># To print the regular independent samples t-test result</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_two_a_t_test)</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct Mann-Whitney U test if assumptions are not supported</span></span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>hyp_two_a_mann_test <span class="ot">&lt;-</span> <span class="fu">wilcox.test</span>(Refs <span class="sc">~</span> Genuine_or_Fraudulent, <span class="at">data =</span> fraud_or_not_df)</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a><span class="co"># To print the Mann-Whitney U test result</span></span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_two_a_mann_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></li>
 </ol>
 </section>
@@ -3639,52 +3720,52 @@ vertical-align: -.125em;
 <ol type="1">
 <li><p>To check the assumption of normality we will use the <code>ggplot2</code> package to create Q-Q plots for <code>Refs</code> using our original study dataset. The Q-Q plots will be investigated visually. If the assumption of normality is violated we will use the non-parametric Kruskal-Wallis test instead.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To produce Q-Q plot for Refs within the PaperType groups</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">qplot</span>(<span class="at">sample =</span> data<span class="sc">$</span>Refs, <span class="at">geom =</span> <span class="st">&quot;qq&quot;</span>) <span class="sc">+</span></span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>PaperType)</span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="co"># If the assumption of normality is supported, move to Step 2 to test the assumption of homogeneity of variance.</span></span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="co"># If the assumption of normality is violated, move to Step 3 to conduct a Kruskal-Wallis Test test.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To produce Q-Q plot for Refs within the PaperType groups</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">qplot</span>(<span class="at">sample =</span> data<span class="sc">$</span>Refs, <span class="at">geom =</span> <span class="st">&quot;qq&quot;</span>) <span class="sc">+</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>PaperType)</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="co"># If the assumption of normality is supported, move to Step 2 to test the assumption of homogeneity of variance.</span></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="co"># If the assumption of normality is violated, move to Step 3 to conduct a Kruskal-Wallis Test test.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></li>
 <li><p>To test the assumption of homogeneity of variances, we will conduct Levene’s test.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct Levene&#39;s test for homogeneity of variances</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>hyp_two_b_levene_test <span class="ot">&lt;-</span> <span class="fu">leveneTest</span>(Refs <span class="sc">~</span> PaperType, <span class="at">data =</span> data)</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="co"># To print Levene&#39;s test results</span></span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_two_b_levene_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct Levene&#39;s test for homogeneity of variances</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>hyp_two_b_levene_test <span class="ot">&lt;-</span> <span class="fu">leveneTest</span>(Refs <span class="sc">~</span> PaperType, <span class="at">data =</span> data)</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="co"># To print Levene&#39;s test results</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_two_b_levene_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></li>
 <li><p>Once assumptions are tested, we will run the ANOVA using the original study data to determine whether there is a difference exists between the four groups. If Levene’s test rejects the assumption of homogeneity of variance (i.e., if the variances of the four groups are significantly different with an ⍺ = .05), then we will run the Kruskal-Wallis test instead instead.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct the one-way ANOVA if assumptions are met</span></span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>hyp_two_b_anova <span class="ot">&lt;-</span> <span class="fu">aov</span>(Refs <span class="sc">~</span> PaperType, <span class="at">data =</span> data)</span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="co"># To see summary of one-way ANOVA results</span></span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(hyp_two_b_anova)</span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct Kruskal-Wallis test if assumptions are violated</span></span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>hyp_two_b_krusk <span class="ot">&lt;-</span> <span class="fu">kruskal.test</span>(Refs <span class="sc">~</span> PaperType, <span class="at">data =</span> data)</span>
-<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="co"># To print the results of the Kruskal-Wallis test</span></span>
-<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_two_b_krusk)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct the one-way ANOVA if assumptions are met</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>hyp_two_b_anova <span class="ot">&lt;-</span> <span class="fu">aov</span>(Refs <span class="sc">~</span> PaperType, <span class="at">data =</span> data)</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="co"># To see summary of one-way ANOVA results</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(hyp_two_b_anova)</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct Kruskal-Wallis test if assumptions are violated</span></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>hyp_two_b_krusk <span class="ot">&lt;-</span> <span class="fu">kruskal.test</span>(Refs <span class="sc">~</span> PaperType, <span class="at">data =</span> data)</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a><span class="co"># To print the results of the Kruskal-Wallis test</span></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_two_b_krusk)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></li>
 <li><p>If a significant difference is found between the <code>PaperType</code> groups based on the one-way ANOVA, a post-hoc test will be used to determine where the differences lie. Tukey’s Highly Significant Difference (HSD) test will be used if a regular one-way ANOVA was used, which will adjust p-values to avoid inflating the family-wise error rate. If the Kruskal-Wallis test was used, we will follow it up with the Dunn post-hoc test instead using the <code>dunn.test</code> package and a Bonferroni correction to reduce family-wise error rates.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct Tukey&#39;s HSD test if ANOVA indicates significant difference</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>hyp_two_b_TukeyHSD <span class="ot">&lt;-</span> <span class="fu">TukeyHSD</span>(hyp_one_b_anova)</span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="co"># To print Tukey&#39;s HSD test results</span></span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_two_b_TukeyHSD)</span>
-<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct Dunn post-hoc test if used Kruskal-Wallis test</span></span>
-<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dunn.test) <span class="co"># To load the dunn.test package</span></span>
-<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a><span class="co"># To run Dunn&#39;s post-hoc test with bonferonni correction</span></span>
-<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>hyp_two_b_dunn <span class="ot">&lt;-</span> <span class="fu">dunn.test</span>(data<span class="sc">$</span>Refs, data<span class="sc">$</span>PaperType, <span class="at">method=</span><span class="st">&quot;bonferroni&quot;</span>)</span>
-<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a><span class="co"># To print results of Dunn&#39;s post-hoc test</span></span>
-<span id="cb29-14"><a href="#cb29-14" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_two_b_dunn)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct Tukey&#39;s HSD test if ANOVA indicates significant difference</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>hyp_two_b_TukeyHSD <span class="ot">&lt;-</span> <span class="fu">TukeyHSD</span>(hyp_one_b_anova)</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a><span class="co"># To print Tukey&#39;s HSD test results</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_two_b_TukeyHSD)</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct Dunn post-hoc test if used Kruskal-Wallis test</span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dunn.test) <span class="co"># To load the dunn.test package</span></span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a><span class="co"># To run Dunn&#39;s post-hoc test with bonferonni correction</span></span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>hyp_two_b_dunn <span class="ot">&lt;-</span> <span class="fu">dunn.test</span>(data<span class="sc">$</span>Refs, data<span class="sc">$</span>PaperType, <span class="at">method=</span><span class="st">&quot;bonferroni&quot;</span>)</span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a><span class="co"># To print results of Dunn&#39;s post-hoc test</span></span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_two_b_dunn)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></li>
 </ol>
 </section>
@@ -3692,38 +3773,38 @@ vertical-align: -.125em;
 <section id="hypothesis-3-certainty" class="level3">
 <h3 class="anchored" data-anchor-id="hypothesis-3-certainty"><strong>Hypothesis 3:</strong> Certainty</h3>
 <p><strong>Hypothesis 3</strong> investigates the use of certainty language in cases of scientific fraud. While a case study of Deidrik Stapel tended to use more certain language <span class="citation" data-cites="markowitz2014">(<a href="#ref-markowitz2014" role="doc-biblioref">Markowitz &amp; Hancock, 2014</a>)</span>, others have found less certainty language in retracted papers than non-retracted papers <span class="citation" data-cites="dehdarirad2023">(<a href="#ref-dehdarirad2023" role="doc-biblioref">Dehdarirad &amp; Schirone, 2023</a>)</span>. Thus, <strong>Hypothesis 3</strong> is meant to provide clarity regarding the use of certainty language in scientific fraud. Specifically, it is stated as follows:</p>
-<p><strong>Hypothesis 3:</strong> Fraudulent research will contain more certainty sentiment than non-fraudulent research. [Replication]</p>
+<p><strong>Hypothesis 3:</strong> Fraudulent research will contain less certainty than non-fraudulent research. [Replication]</p>
 <section id="testing-hypothesis-3" class="level4">
 <h4 class="anchored" data-anchor-id="testing-hypothesis-3">Testing Hypothesis 3:</h4>
 <p>To test <strong>Hypothesis 3</strong>, we will use the previously created data frame <code>fraud_or_not_df</code><a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a> to compare the mean <code>CertSent</code> score between the <code>FPaper</code> and <code>GPaper</code> groups using an independent-samples t-test.</p>
 <ol type="1">
 <li><p>To check the assumption of normality we will use the <code>ggplot2</code> package to create Q-Q plots for <code>CertSent</code> within the <code>FPaper</code> and <code>GPaper</code> groups. The Q-Q plots will be investigated visually. Because each group will have approximately n=60 cases, our t-test should be robust to violations of this assumption. However, if the assumption of normality is grossly violated we will use a bootstrapped t-test to fit a more robust model.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To produce Q-Q plot for CertSent within the FPaper and GPaper groups</span></span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="fu">qplot</span>(<span class="at">sample =</span> fraud_or_not_df<span class="sc">$</span>CertSent, <span class="at">geom =</span> <span class="st">&quot;qq&quot;</span>) <span class="sc">+</span></span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Genuine_or_Fraudulent)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To produce Q-Q plot for CertSent within the FPaper and GPaper groups</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">qplot</span>(<span class="at">sample =</span> fraud_or_not_df<span class="sc">$</span>CertSent, <span class="at">geom =</span> <span class="st">&quot;qq&quot;</span>) <span class="sc">+</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Genuine_or_Fraudulent)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></li>
 <li><p>To check the assumption of homogeneity of variances, we will conduct Levene’s test using the <code>car</code> package.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct Levene&#39;s test for homogeneity of variances</span></span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>hyp_three_levene_test <span class="ot">&lt;-</span> <span class="fu">leveneTest</span>(CertSent <span class="sc">~</span> Genuine_or_Fraudulent, <span class="at">data =</span> fraud_or_not_df)</span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="co"># To print Levene&#39;s test result</span></span>
-<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_three_levene_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct Levene&#39;s test for homogeneity of variances</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>hyp_three_levene_test <span class="ot">&lt;-</span> <span class="fu">leveneTest</span>(CertSent <span class="sc">~</span> Genuine_or_Fraudulent, <span class="at">data =</span> fraud_or_not_df)</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a><span class="co"># To print Levene&#39;s test result</span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_three_levene_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></li>
 <li><p>Once assumptions are tested, we will run the independent samples t-test using the <code>fraud_or_not_df</code> data frame to determine whether there is a difference between fraudulent papers and genuine papers. If Levene’s test rejects the assumption of homogeneity of variance (i.e., if the variances of the two groups are significantly different with an ⍺ = .05), then we will run Welch’s t-test instead.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct the regular independent samples t-test</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>hyp_three_t_test <span class="ot">&lt;-</span> <span class="fu">t.test</span>(CertSent <span class="sc">~</span> Genuine_or_Fraudulent, <span class="at">data =</span> fraud_or_not_df)</span>
-<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="co"># To print the regular independent samples t-test result</span></span>
-<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_three_t_test)</span>
-<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct Welch&#39;s t-test if Levene&#39;s test is significant</span></span>
-<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>hyp_three_welch_t_test <span class="ot">&lt;-</span> <span class="fu">t.test</span>(CertSent <span class="sc">~</span> Genuine_or_Fraudulent, <span class="at">data =</span> fraud_or_not_df, <span class="at">var.equal =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a><span class="co"># To print the Welch&#39;s t-test result</span></span>
-<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_three_welch_t_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct the regular independent samples t-test</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>hyp_three_t_test <span class="ot">&lt;-</span> <span class="fu">t.test</span>(CertSent <span class="sc">~</span> Genuine_or_Fraudulent, <span class="at">data =</span> fraud_or_not_df)</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="co"># To print the regular independent samples t-test result</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_three_t_test)</span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a><span class="co"># To conduct Welch&#39;s t-test if Levene&#39;s test is significant</span></span>
+<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>hyp_three_welch_t_test <span class="ot">&lt;-</span> <span class="fu">t.test</span>(CertSent <span class="sc">~</span> Genuine_or_Fraudulent, <span class="at">data =</span> fraud_or_not_df, <span class="at">var.equal =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a><span class="co"># To print the Welch&#39;s t-test result</span></span>
+<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_three_welch_t_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></li>
 </ol>
 </section>
@@ -3744,31 +3825,31 @@ vertical-align: -.125em;
 <ol type="1">
 <li><p>To attain the expected probabiltiy we will calculate the inverse of the mean number of authors on all MAFP where the corresponding author is known. To do this, we will first need to filter out other <code>PaperType</code> categories and MAFP cases where the corresponding author is unknown (i.e., <code>FraudCorrAuth</code> has a missing value) to make a new data frame, <code>hypothesis_four_df</code>. Then, we will calculate the mean <code>NumAuth</code> within this data frame and take its inverse.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To create data frame that only includes MAFP with a score for FraudCorrAuth</span></span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>hypotheeis_four_df <span class="ot">&lt;-</span> data[data<span class="sc">$</span>PaperType <span class="sc">==</span> <span class="st">&#39;MAFP&#39;</span> <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(data<span class="sc">$</span>FraudCorrAuth)]</span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a><span class="co"># To print the data frame to check it</span></span>
-<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hypotheeis_four_df)</span>
-<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a><span class="co"># To calculate the mean number of authors within the data frame</span></span>
-<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>mean_MAFP_NumAuth_corrauth_known <span class="ot">&lt;-</span> <span class="fu">mean</span>(hypotheeis_four_df<span class="sc">$</span>num_authors)</span>
-<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a><span class="co"># To display the mean value</span></span>
-<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(mean_MAFP_NumAuth_corrauth_known)</span>
-<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a><span class="co"># To calculate the inverse of mean_MAFP_NumAuth_corrauth_known</span></span>
-<span id="cb33-14"><a href="#cb33-14" aria-hidden="true" tabindex="-1"></a>expected_prob_FraudCorrAuth <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> mean_MAFP_NumAuth_corrauth_known</span>
-<span id="cb33-15"><a href="#cb33-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-16"><a href="#cb33-16" aria-hidden="true" tabindex="-1"></a><span class="co"># To display the expected probability</span></span>
-<span id="cb33-17"><a href="#cb33-17" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(expected_prob_FraudCorrAuth)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To create data frame that only includes MAFP with a score for FraudCorrAuth</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>hypotheeis_four_df <span class="ot">&lt;-</span> data[data<span class="sc">$</span>PaperType <span class="sc">==</span> <span class="st">&#39;MAFP&#39;</span> <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(data<span class="sc">$</span>FraudCorrAuth)]</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="co"># To print the data frame to check it</span></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hypotheeis_four_df)</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a><span class="co"># To calculate the mean number of authors within the data frame</span></span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>mean_MAFP_NumAuth_corrauth_known <span class="ot">&lt;-</span> <span class="fu">mean</span>(hypotheeis_four_df<span class="sc">$</span>num_authors)</span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a><span class="co"># To display the mean value</span></span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(mean_MAFP_NumAuth_corrauth_known)</span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a><span class="co"># To calculate the inverse of mean_MAFP_NumAuth_corrauth_known</span></span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>expected_prob_FraudCorrAuth <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> mean_MAFP_NumAuth_corrauth_known</span>
+<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a><span class="co"># To display the expected probability</span></span>
+<span id="cb40-17"><a href="#cb40-17" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(expected_prob_FraudCorrAuth)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></li>
 <li><p>Next, we will conduct a binomial test to compare the observed likelihood that a corresponding author is the fraudulent author to the expected probability (<code>expected_prob_FraudCorrAuth</code>).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To run the binomial test with the expected probability within the hypothesis four data frame</span></span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>hyp_four_binomial_test <span class="ot">&lt;-</span> <span class="fu">binom.test</span>(<span class="fu">sum</span>(hypotheeis_four_df<span class="sc">$</span>FraudCorrAuth), <span class="fu">nrow</span>(data), <span class="at">p =</span> expected_prob_FraudCorrAuth, <span class="at">alternative =</span> <span class="st">&quot;two.sided&quot;</span>)</span>
-<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="co"># To print the binomial test results</span></span>
-<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_four_binomial_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To run the binomial test with the expected probability within the hypothesis four data frame</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>hyp_four_binomial_test <span class="ot">&lt;-</span> <span class="fu">binom.test</span>(<span class="fu">sum</span>(hypotheeis_four_df<span class="sc">$</span>FraudCorrAuth), <span class="fu">nrow</span>(data), <span class="at">p =</span> expected_prob_FraudCorrAuth, <span class="at">alternative =</span> <span class="st">&quot;two.sided&quot;</span>)</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a><span class="co"># To print the binomial test results</span></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hyp_four_binomial_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></li>
 </ol>
 
