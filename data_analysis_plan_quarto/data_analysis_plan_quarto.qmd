@@ -175,49 +175,77 @@ Data preprocessing procedures will utilize Python [@python2023]. All Python scri
 ## Text Analysis Procedure
 
 1.  Once txt files are preprocessed and ready for text analysis, text analysis tools will be used to measure features of language.
-2.  For [Linguistic Inquiry and Word Count (LIWC)](https://www.liwc.app "LIWC Tool Website") [@boyd2022], [Automatic Readability Tool for English (ARTE)](https://nlp.gsu.edu/home "ARTE Tool Website"), and [The Lexical Suite](http://www.lexicalsuite.com "The Lexical Suite Tool Website") [@rocklage2023] papers will be analyzed by uploading the clean txt files directly and saving output as unique csv file.
-    -   These csv files will later be merged with the study data set using the following Python script that uses the DOI as the identifier.
+
+2.  For [Linguistic Inquiry and Word Count (LIWC)](https://www.liwc.app "LIWC Tool Website") [@boyd2022], [The Lexical Suite](http://www.lexicalsuite.com "The Lexical Suite Tool Website") [@rocklage2023], and our custom Python script that utilizes the `textstat` module [@aggarwal2022] to calculate Flesch Reading Ease [@flesch1948], papers will be analyzed by inputting the clean txt files directly and saving output as unique csv file.
+
+    -   Script for measuring Flesch Reading Ease and creating a CSV file.
 
         ```{python, python.reticulate=FALSE}
-        import os
-        import pandas as pd
+        import glob
+        import textstat
+        import csv
 
-        # To specify my user-specific information
-        username = 'benjaminzubaly'
-        base_path = f'/Users/{username}/Downloads'
+        # Path to the folder containing text files
+        text_files_path = '/Users/benjaminzubaly/Downloads/clean_txt/*.txt'
 
-        # To specify paths to the master file and the directory for the output file
-        master_file_path = os.path.join(base_path, 'thesis_study_data.csv')
-        output_dir = os.path.join(base_path, 'merged_data')
+        # Path for the output CSV file
+        output_csv_path = '/Users/benjaminzubaly/Downloads/flesch_scores.csv'
 
-        # To check if the output directory exists
-        os.makedirs(output_dir, exist_ok=True)
+        with open(output_csv_path, 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(['DOI', 'flesch_re'])
 
-        # To load the master file as a data frame
-        master_df = pd.read_csv(master_file_path)
-
-        # Specifying prefixes to add to columns in new merged_data (to easily identify which text analysis program the variable is coming from)
-        file_info = {
-            'ARTE_data.csv': 'ARTE_',
-            'lexical_suite_data.csv': 'LS_',
-            'LIWC_data.csv': 'LIWC_'
-        }
-
-        # To merge each file into the master file with prefixed column names
-        for file_name, prefix in file_info.items():
-            file_path = os.path.join(base_path, file_name)
-            df = pd.read_csv(file_path)
-
-            # To rename new columns with the specified prefix (without changing DOI column)
-            df.rename(columns={col: f'{prefix}{col}' for col in df.columns if col != 'DOI'}, inplace=True)
-
-            # To merge with master dataframe based on DOI
-            master_df = pd.merge(master_df, df, on='DOI', how='left')
-
-        # Save the merged file in the new 'merged_data' folder directory
-        output_file_path = os.path.join(output_dir, 'merged_thesis_study_data.csv')
-        master_df.to_csv(output_file_path, index=False)
+            for path in glob.glob(text_files_path):
+                with open(path, 'r') as file:
+                    text = file.read()
+                    score = textstat.flesch_reading_ease(text)
+                    # Extract filename from path, remove prefix and extension
+                    filename = path.split('/')[-1].replace('clean_', '').replace('.txt', '').replace(':', '/')
+                    writer.writerow([filename, score])
         ```
+
+3.  These csv files will later be merged with the study data set using the following Python script that uses the DOI as the identifier.
+
+    ```{python, python.reticulate=FALSE}
+    import os
+    import pandas as pd
+
+    # To specify my user-specific information
+    username = 'benjaminzubaly'
+    base_path = f'/Users/{username}/Downloads'
+
+    # To specify paths to the master file and the directory for the output file
+    master_file_path = os.path.join(base_path, 'thesis_study_data.csv')
+    output_dir = os.path.join(base_path, 'merged_data')
+
+    # To check if the output directory exists
+    os.makedirs(output_dir, exist_ok=True)
+
+    # To load the master file as a data frame
+    master_df = pd.read_csv(master_file_path)
+
+    # Specifying prefixes to add to columns in new merged_data (to easily identify which text analysis program the variable is coming from)
+    file_info = {
+        'ARTE_data.csv': 'ARTE_',
+        'lexical_suite_data.csv': 'LS_',
+        'LIWC_data.csv': 'LIWC_'
+    }
+
+    # To merge each file into the master file with prefixed column names
+    for file_name, prefix in file_info.items():
+        file_path = os.path.join(base_path, file_name)
+        df = pd.read_csv(file_path)
+
+        # To rename new columns with the specified prefix (without changing DOI column)
+        df.rename(columns={col: f'{prefix}{col}' for col in df.columns if col != 'DOI'}, inplace=True)
+
+        # To merge with master dataframe based on DOI
+        master_df = pd.merge(master_df, df, on='DOI', how='left')
+
+    # Save the merged file in the new 'merged_data' folder directory
+    output_file_path = os.path.join(output_dir, 'merged_thesis_study_data.csv')
+    master_df.to_csv(output_file_path, index=False)
+    ```
 
 # Data Analysis
 
